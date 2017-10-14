@@ -1,11 +1,13 @@
 import axios from 'axios';
 import React, { Component } from 'react';
 
-const base = 'http://api.openweathermap.org/data/2.5/weather?appid=d39f22db0c0bbbf0657284068a57a074'
+const base = 'http://api.openweathermap.org/data/2.5/forecast?appid=d39f22db0c0bbbf0657284068a57a074'
 
 //const getWeatherUrl = (lat,lon) => `${base}&lat=${lat}&lon=${lon}`;
 
 var old = ''; //used for compairing new and old state for api calling
+
+var temp_arr = [];
 
 const getWeatherUrlCity = (city) => `${base}&q=${city}`;
 
@@ -20,7 +22,8 @@ class GetData extends Component {
   render(){
     this.Change();
     return(
-      <p>{this.state.name} {this.state.temp}</p>
+      <div>
+        <ul>{this.state.name}<br/><br/>{this.state.temp}</ul></div>
     );
   }
 
@@ -39,14 +42,22 @@ class GetData extends Component {
 
 // api calling recieveing response and error handling
   AfterChange(){
+
+    temp_arr = [];
+
     axios.get(getWeatherUrlCity(this.props.city))
       .then(response => {
         console.log(response);
-        var temp = response.data.main.temp_max;
-        var name = response.data.name;
+        for (var i = 0; i < 40; i++) {
+          temp_arr.push(this.round((response.data.list[i].main.temp_max-273.15),2));
+          i+=7;
+        }
+        var temp = temp_arr.map((temp)=>(<li>{temp}</li>));
+        var name = response.data.city.name +','+ response.data.city.country;
+        console.log(temp);
         this.setState({
           name: name,
-          temp: this.round((temp-273.15),2)
+          temp: temp
         });
       })
       .catch(error => {
