@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { Component } from 'react';
+var Plotly = require('plotly.js/lib/core');
 
 const base = 'http://api.openweathermap.org/data/2.5/forecast?appid=d39f22db0c0bbbf0657284068a57a074'
 
@@ -8,6 +9,7 @@ const base = 'http://api.openweathermap.org/data/2.5/forecast?appid=d39f22db0c0b
 var old = ''; //used for compairing new and old state for api calling
 
 var temp_arr = [];
+var date_arr = [];
 
 const getWeatherUrlCity = (city) => `${base}&q=${city}`;
 
@@ -23,7 +25,9 @@ class GetData extends Component {
     this.Change();
     return(
       <div>
-        <ul>{this.state.name}<br/><br/>{this.state.temp}</ul></div>
+        <ul>{this.state.name}<br/><br/>{this.state.temp}</ul>
+        <div id="myDiv"></div>
+      </div>
     );
   }
 
@@ -44,12 +48,14 @@ class GetData extends Component {
   AfterChange(){
 
     temp_arr = [];
-
+    date_arr = [];
     axios.get(getWeatherUrlCity(this.props.city))
       .then(response => {
         console.log(response);
         for (var i = 0; i < 40; i++) {
           temp_arr.push(this.round((response.data.list[i].main.temp_max-273.15),2));
+          var date = new Date(response.data.list[i].dt*1000);
+          date_arr.push(date);
           i+=7;
         }
         var temp = temp_arr.map((temp)=>(<li>{temp}</li>));
@@ -59,6 +65,14 @@ class GetData extends Component {
           name: name,
           temp: temp
         });
+        var data = [
+          {
+            x: date_arr,
+            y: temp_arr,
+            type: 'scatter'
+          }
+        ];
+        Plotly.newPlot('myDiv', data);  // TEMP:
       })
       .catch(error => {
         console.log(this.props.city);
