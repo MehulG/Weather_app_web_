@@ -3,7 +3,7 @@ body{
 }
 #content{
   font-size: 1.5em;
-  color: white;
+  color: #222;
   font-family: sans-serif;
   display: grid;
   grid-template-columns: repeat(5,1fr);
@@ -12,12 +12,17 @@ body{
   margin: 0 auto;
 }
 #content div{
-  background: #4c595f;
-  padding: 30px;
+  /*background: #4c595f;*/
+  padding: 20px;
+  border-color: black;
+  border-width: 5px;
 }
 #content div:nth-child(even){
-  background: #777;
+  /*background: #777;*/
 }
 #city_name{
   font-size: 2em;
+}
+.weather{
+  font-size: 1em;
 }
