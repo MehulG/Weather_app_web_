@@ -1,8 +1,10 @@
 import axios from 'axios';
 import React, { Component } from 'react';
 var Plotly = require('plotly.js/lib/core');
+require('./grid.css');
 
 const base = 'http://api.openweathermap.org/data/2.5/forecast?appid=d39f22db0c0bbbf0657284068a57a074'
+
 
 //const getWeatherUrl = (lat,lon) => `${base}&lat=${lat}&lon=${lon}`;
 
@@ -12,6 +14,7 @@ var temp_arr = [];
 var date_arr = [];
 
 const getWeatherUrlCity = (city) => `${base}&q=${city}`;
+
 
 class GetData extends Component {
   constructor(props){
@@ -25,7 +28,13 @@ class GetData extends Component {
     this.Change();
     return(
       <div>
-        <ul>{this.state.name}<br/><br/>{this.state.temp}</ul>
+        <br/>
+        <div id = 'city_name'>{this.state.name}</div>
+        <br/><br/>
+        <div id = 'content'>
+          {this.state.temp}
+        </div>
+        <br/>
         <div id="myDiv"></div>
       </div>
     );
@@ -35,7 +44,7 @@ class GetData extends Component {
 
   //custom functions
 
-//basically used to check if new city is added
+//Used to check if new city is added
   Change(){
     if(old !== this.props.city){
       this.AfterChange();
@@ -51,30 +60,57 @@ class GetData extends Component {
     date_arr = [];
     axios.get(getWeatherUrlCity(this.props.city))
       .then(response => {
+
         console.log(response);
+
         for (var i = 0; i < 40; i++) {
           temp_arr.push(this.round((response.data.list[i].main.temp_max-273.15),2));
           var date = new Date(response.data.list[i].dt*1000);
           date_arr.push(date);
           i+=7;
         }
-        var temp = temp_arr.map((temp)=>(<li>{temp}</li>));
-        var name = response.data.city.name +','+ response.data.city.country;
+
+        var temp = temp_arr.map((temp)=>(<div>{temp} °C</div>));
+
+
+        if (response.data.city.country) {
+          var name = response.data.city.name +', '+ response.data.city.country;
+        }else {
+           name = response.data.city.name;
+        }
+
         console.log(temp);
+
         this.setState({
           name: name,
           temp: temp
         });
+
         var data = [
           {
             x: date_arr,
             y: temp_arr,
+            line: {shape: 'spline'},
             type: 'scatter'
           }
         ];
-        Plotly.newPlot('myDiv', data);  // TEMP:
+
+        Plotly.newPlot('myDiv', data);
       })
       .catch(error => {
+        temp_arr = [];
+        date_arr = [];
+        var data = [
+          {
+            x: [],
+            y: [],
+            line: {shape: 'spline'},
+            type: 'scatter'
+          }
+        ];
+
+        Plotly.newPlot('myDiv', data);
+
         console.log(this.props.city);
         this.setState({
           name:'Error',
