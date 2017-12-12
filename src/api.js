@@ -105,7 +105,7 @@ class GetData extends Component {
         var temp = temp_arr.map((temp)=>(<div>{temp} °C</div>));
         var weather = weather_arr.map((weather) => <div className = 'weather'>{weather}</div>)
 
-        var day_map = ['Sunday','Monday', 'Tuesday', 'Thursday', 'Friday', 'Saturday'];
+        var day_map = ['Sunday','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         var day = date_arr.map((date) => <div className = 'weather'>{day_map[date.getDay()]}</div>)
 
